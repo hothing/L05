@@ -6,6 +6,7 @@
   <ItemGroup>
     <Compile Include="R0Lang.fs" />
     <Compile Include="R0Interpreter.fs" />
+	<Compile Include="R0PartialEval.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>
