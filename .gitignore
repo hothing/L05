@@ -1,0 +1,8 @@
+bin/
+obj/
+*.dll
+*.so
+*.exe
+
+.fake
+*.bak
