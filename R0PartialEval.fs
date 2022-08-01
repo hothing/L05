@@ -30,4 +30,4 @@ module R0PartialEval
         
     let partialEvaluator prg =
         match prg with 
-        | Program exp -> peval exp
+        | Program exp -> Program(peval exp)
