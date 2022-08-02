@@ -1,6 +1,5 @@
-﻿open R0Lang
-open R0Interpreter
-open R0PartialEval
+﻿open R1Lang
+open R1Interpreter
 
 printfn "Hello from F#: Nanopass compiler book exercises"
 
@@ -9,39 +8,25 @@ let inputs = [5]
 // (program (- (- (+ 12 -2) (read))))
 let e1 = Binary(Add, EInt 12, EInt -2)
 let e2 = Binary(Sub, e1, Read)
-let e3 = Unary(Plus, e2)
+let e3 = Unary(Minus, e2)
 let prg = Program(e3)
 
-interpreter prg inputs |> printfn ">> %A"
+interpreter prg inputs |> printfn "[0]>> %A"
 
 prg |> printfn "[0]> %A"
-//sort prg |> foldA |> foldA |> printfn "[0]~> %A"
-partialEvaluator prg |> printfn "[0]--> %A"
 
-// Expr : (1 - (1 + (1 + R)))
-let e4 = Binary(Add, EInt 1, Read)
-let e5 = Binary(Add, EInt 1, e4)
-let e6 = Binary(Sub, EInt 1, e5)
-//let e7 = Binary(Add, EInt 1, e4)
-//let e8 = Binary(Add, EInt 1, e4)
-let prg2 = Program(e6)
+let prg2 = Program(Let("x", EInt 13, Var("x")))
+interpreter prg2 inputs |> printfn "[1]>> %A"
 
-prg2 |> printfn "[1]> %A"
-//foldA prg2 |> printfn "[1]~> %A"
-partialEvaluator prg2 |> printfn "[1]--> %A"
+let prg3 = Program(Let("x", EInt 13, Binary(Sub, Var("x"), Read)))
+interpreter prg3 inputs |> printfn "[2]>> %A"
 
-// Expr : (1 - (1 + ((2  * 3) + R))) == -6 + R
-let prg3 = Program(Binary(Sub, EInt 1, Binary(Add, EInt 1, Binary(Add, Binary(Mul, EInt 2, EInt 3), Read))))
+// (program (let ([x 32]) (+ (let ([x 10]) x) x)))
+// (program (let ([x1 32]) (+ (let ([x2 10]) x2) x1)))
 
-prg3 |> printfn "[2]> %A"
-partialEvaluator prg3 |> printfn "[2]--> %A"
+let prg4 = Program(Let("x", EInt 32, Binary(Add, Let("x", EInt 10, Var("x")), Var("x"))))
+interpreter prg4 inputs |> printfn "[3]>> %A"
 
-// Expr : (1 - (2 * ((1 * 2) * R))) == -5 + R
-let prg4 = Program(Binary(Sub, EInt 1, Binary(Mul, EInt 1, Binary(Mul, Binary(Mul, EInt 1, EInt 2), Read))))
-
-let partialEvaluator prg =
-        match prg with 
-        | Program exp -> Program(expSort exp |> peval |> foldAdd |> foldMul)
-
-prg4 |> printfn "[3]> %A"
-partialEvaluator prg4 |> printfn "[3]--> %A"
+// (program (let ([x (read)]) (let ([y (read)]) (- x y))))
+let prg5 = Program(Let("x", Read, Let("y", Read, Binary(Sub, Var("x"), Var("y")))))
+interpreter prg4 [52; 10] |> printfn "[4]>> %A"

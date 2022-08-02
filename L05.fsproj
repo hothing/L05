@@ -4,9 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="R0Lang.fs" />
-    <Compile Include="R0Interpreter.fs" />
-	<Compile Include="R0PartialEval.fs" />
-    <Compile Include="Program.fs" />
+    <Compile Include="R1Lang.fs" />
+    <Compile Include="R1Interpreter.fs" />
+	  <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>
