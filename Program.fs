@@ -1,5 +1,6 @@
 ﻿open R1Lang
 open R1Interpreter
+open C0Lang
 
 printfn "Hello from F#: Nanopass compiler book exercises"
 
@@ -30,3 +31,6 @@ interpreter prg4 inputs |> printfn "[3]>> %A"
 // (program (let ([x (read)]) (let ([y (read)]) (- x y))))
 let prg5 = Program(Let("x", Read, Let("y", Read, Binary(Sub, Var("x"), Var("y")))))
 interpreter prg4 [52; 10] |> printfn "[4]>> %A"
+
+// C0 language tests 
+let reg = R15
