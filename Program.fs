@@ -29,3 +29,19 @@ let prg2 = Program(e6)
 prg2 |> printfn "[1]> %A"
 //foldA prg2 |> printfn "[1]~> %A"
 partialEvaluator prg2 |> printfn "[1]--> %A"
+
+// Expr : (1 - (1 + ((2  * 3) + R))) == -6 + R
+let prg3 = Program(Binary(Sub, EInt 1, Binary(Add, EInt 1, Binary(Add, Binary(Mul, EInt 2, EInt 3), Read))))
+
+prg3 |> printfn "[2]> %A"
+partialEvaluator prg3 |> printfn "[2]--> %A"
+
+// Expr : (1 - (2 * ((1 * 2) * R))) == -5 + R
+let prg4 = Program(Binary(Sub, EInt 1, Binary(Mul, EInt 1, Binary(Mul, Binary(Mul, EInt 1, EInt 2), Read))))
+
+let partialEvaluator prg =
+        match prg with 
+        | Program exp -> Program(expSort exp |> peval |> foldAdd |> foldMul)
+
+prg4 |> printfn "[3]> %A"
+partialEvaluator prg4 |> printfn "[3]--> %A"
