@@ -6,7 +6,9 @@
   <ItemGroup>
     <Compile Include="R1Lang.fs" />
     <Compile Include="R1Interpreter.fs" />
+    <Compile Include="R1Uniquify.fs" />
     <Compile Include="C0Lang.fs" />
+    <Compile Include="X0Lang.fs" />
 	  <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>
