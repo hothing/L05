@@ -33,4 +33,8 @@ let prg5 = Program(Let("x", Read, Let("y", Read, Binary(Sub, Var("x"), Var("y"))
 interpreter prg4 [52; 10] |> printfn "[4]>> %A"
 
 // uniquify tests 
-uniquify prg5  |> printfn "[5]>> %A"
+uniquify prg |> printfn "[5.0]>> %A"
+uniquify prg2  |> printfn "[5.1]>> %A"
+uniquify prg3  |> printfn "[5.2]>> %A"
+uniquify prg4  |> printfn "[5.3]>> %A"
+uniquify prg5  |> printfn "[5.4]>> %A"
