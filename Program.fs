@@ -46,3 +46,8 @@ flatten prg2 |> printfn "[6.1]>> %A"
 flatten prg3 |> printfn "[6.2]>> %A"
 flatten prg4 |> printfn "[6.3]>> %A"
 flatten prg5 |> printfn "[6.4]>> %A"
+
+// (program (let [x 1] (let [x -x] (let [x (+ x 10)] x))))
+let prg6 = Program(Let("x", EInt 1, Let("x", Unary(Minus, Var("x")), Let("x", Binary(Add, Var("x"), EInt 10), Var("x")))))
+interpreter prg6 [] |> printfn "[7]>> %A"
+flatten prg6 |> printfn "[7.1]>> %A"
