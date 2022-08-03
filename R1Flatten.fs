@@ -2,6 +2,7 @@ module R1Flatten
 
     open R1Lang
     open C0Lang
+    open R1Uniquify
 
     let rec r1flatten exp assigments vars =
         let genName vars =
@@ -57,5 +58,6 @@ module R1Flatten
     let flatten prg =
         match prg with 
         | Program exp -> 
-            let arg, nAssigments, nVars = r1flatten exp [] (0, [])
-            C0Program((snd nVars), List.rev ((C0Return(arg))::nAssigments))
+            let nExp, vMap = r1uniquify exp (0, [])
+            let arg, nAssigments, nVars = r1flatten nExp [] (0, [])
+            (C0Program((snd nVars), List.rev ((C0Return(arg))::nAssigments)), vMap)

@@ -42,7 +42,7 @@ uniquify prg5  |> printfn "[5.4]>> %A"
 
 // flatten tests 
 flatten prg |> printfn "[6.0]>> %A"
-flatten (fst (uniquify prg2)) |> printfn "[6.1]>> %A"
-flatten (fst (uniquify prg3)) |> printfn "[6.2]>> %A"
-flatten (fst (uniquify prg4)) |> printfn "[6.3]>> %A"
-flatten (fst (uniquify prg5)) |> printfn "[6.4]>> %A"
+flatten prg2 |> printfn "[6.1]>> %A"
+flatten prg3 |> printfn "[6.2]>> %A"
+flatten prg4 |> printfn "[6.3]>> %A"
+flatten prg5 |> printfn "[6.4]>> %A"
