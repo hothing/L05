@@ -37,4 +37,6 @@ module R1Uniquify
         
     let uniquify prg =
         match prg with 
-        | Program exp -> r1uniquify exp (0, [])
+        | Program exp -> 
+            let nExp, vMap = r1uniquify exp (0, [])
+            (Program nExp, vMap)

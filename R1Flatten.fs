@@ -15,25 +15,24 @@ module R1Flatten
 
         match exp with
         | EInt v -> 
-            printfn "<int> = %A" exp 
+            //printfn "<int> = %A" exp 
             (C0Int(v), assigments, vars) // C0Int
         | Read -> 
-            printfn "<read> = %A" exp 
+            //printfn "<read> = %A" exp 
             let tname, nVars = genName vars
             let nAssigments = (C0Assign(tname, C0Read))::assigments
             (C0Var(tname), nAssigments, nVars)           
         | Var vname ->
-            printfn "<var> = %A" exp 
-            let nVars = addName vars vname
-            (C0Var(vname), assigments, nVars) // C0Arg:C0Var            
+            //printfn "<var> = %A" exp 
+            (C0Var(vname), assigments, vars) // C0Arg:C0Var            
         | Unary (op, e1) -> 
-            printfn "<unary> = %A" exp 
+            //printfn "<unary> = %A" exp 
             let cexp, nAssigments, nVars = r1flatten e1 assigments vars
             let tname, nVars2 = genName nVars
             let nAssigments2 = (C0Assign(tname, C0Arg(cexp)))::nAssigments
             (C0Var(tname), nAssigments2, nVars2)
         | Binary (op, e1, e2) -> 
-            printfn "<binary> = %A" exp 
+            //printfn "<binary> = %A" exp 
             let arg1, nAssigments, nVars = r1flatten e1 assigments vars
             let arg2, nAssigments, nVars = r1flatten e2 nAssigments nVars
             let tname, nVars = genName nVars
@@ -46,14 +45,14 @@ module R1Flatten
             let nAssigments = (C0Assign(tname, cexp))::nAssigments
             (C0Var(tname), nAssigments, nVars)
         | Let (vname, expInit, expBody) ->
-            printfn "<let> = %A" exp 
+            //printfn "<let> = %A" exp 
             let arg1, nAssigments, nVars = r1flatten expInit assigments vars
-            let tname, nVars = genName nVars
-            let nAssigments = (C0Assign(tname, C0Arg(arg1)))::nAssigments
-            let arg2, nAssigments, nVars = r1flatten expBody nAssigments nVars
+            let nAssigments = (C0Assign(vname, C0Arg(arg1)))::nAssigments
             let nVars = addName nVars vname
-            let nAssigments = (C0Assign(vname, C0Arg(arg2)))::nAssigments            
-            (C0Var(vname), nAssigments, nVars)
+            let arg2, nAssigments, nVars = r1flatten expBody nAssigments nVars
+            let tname, nVars = genName nVars
+            let nAssigments = (C0Assign(tname, C0Arg(arg2)))::nAssigments            
+            (C0Var(tname), nAssigments, nVars)
 
     let flatten prg =
         match prg with 
