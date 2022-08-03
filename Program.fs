@@ -1,6 +1,7 @@
 ﻿open R1Lang
 open R1Interpreter
 open R1Uniquify
+open R1Flatten
 
 printfn "Hello from F#: Nanopass compiler book exercises"
 
@@ -38,3 +39,13 @@ uniquify prg2  |> printfn "[5.1]>> %A"
 uniquify prg3  |> printfn "[5.2]>> %A"
 uniquify prg4  |> printfn "[5.3]>> %A"
 uniquify prg5  |> printfn "[5.4]>> %A"
+
+// flatten tests 
+prg |> printfn "[6.0]~~ %A"
+flatten prg |> printfn "[6.0]>> %A"
+(*
+flatten prg2  |> printfn "[6.1]>> %A"
+flatten prg3  |> printfn "[6.2]>> %A"
+flatten prg4  |> printfn "[6.3]>> %A"
+flatten prg5  |> printfn "[6.4]>> %A"
+*)

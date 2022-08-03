@@ -3,39 +3,60 @@ module R1Flatten
     open R1Lang
     open C0Lang
 
-    let rec r1flatten exp vars =
-        match exp with
-        | EInt v -> 
+    let rec r1flatten exp assigments vars =
+        let genName vars =
             let index = (fst vars) + 1
             let tname = "m." + index.ToString()
             let nVars = (index, tname::(snd vars))
-            ()
+            (tname, nVars)
+
+        let addName vars name =
+            (fst vars, name::(snd vars))
+
+        match exp with
+        | EInt v -> 
+            printfn "<int> = %A" exp 
+            (C0Int(v), assigments, vars) // C0Int
         | Read -> 
-            ()
+            printfn "<read> = %A" exp 
+            let tname, nVars = genName vars
+            let nAssigments = (C0Assign(tname, C0Read))::assigments
+            (C0Var(tname), nAssigments, nVars)           
         | Var vname ->
-            let index = (fst vars) + 1
-            let nVars = (index, vname::(snd vars))
-            ()
-            
+            printfn "<var> = %A" exp 
+            let nVars = addName vars vname
+            (C0Var(vname), assigments, nVars) // C0Arg:C0Var            
         | Unary (op, e1) -> 
-            ()
+            printfn "<unary> = %A" exp 
+            let cexp, nAssigments, nVars = r1flatten e1 assigments vars
+            let tname, nVars2 = genName nVars
+            let nAssigments2 = (C0Assign(tname, C0Arg(cexp)))::nAssigments
+            (C0Var(tname), nAssigments2, nVars2)
         | Binary (op, e1, e2) -> 
-            (*
-            let r1, nInputs = r1flatten e1 vars
-            let r2, nInputs2 = r1flatten e2 vars
-            *)
-            match op with
-            | Add ->
-                ()
-            | Sub ->
-                ()
-            | Mul ->
-                ()
-            | Div ->
-                ()
+            printfn "<binary> = %A" exp 
+            let arg1, nAssigments, nVars = r1flatten e1 assigments vars
+            let arg2, nAssigments, nVars = r1flatten e2 nAssigments nVars
+            let tname, nVars = genName nVars
+            let cexp =  
+                match op with
+                | Add -> C0Add(arg1, arg2)
+                | Sub -> C0Sub(arg1, arg2)
+                | Mul -> C0Mul(arg1, arg2)
+                | Div -> C0Div(arg1, arg2)
+            let nAssigments = (C0Assign(tname, cexp))::nAssigments
+            (C0Var(tname), nAssigments, nVars)
         | Let (vname, expInit, expBody) ->
-            (*
-            let iValue, nInputs = r1interp expInit env inputs 
-            let nEnv = (vname, iValue)::env
-            *)
-            r1flatten expBody (0, [])
+            printfn "<let> = %A" exp 
+            let arg1, nAssigments, nVars = r1flatten expInit assigments vars
+            let tname, nVars = genName nVars
+            let nAssigments = (C0Assign(tname, C0Arg(arg1)))::nAssigments
+            let arg2, nAssigments, nVars = r1flatten expBody nAssigments nVars
+            let nVars = addName nVars vname
+            let nAssigments = (C0Assign(vname, C0Arg(arg2)))::nAssigments            
+            (C0Var(vname), nAssigments, nVars)
+
+    let flatten prg =
+        match prg with 
+        | Program exp -> 
+            let arg, nAssigments, nVars = r1flatten exp [] (0, [])
+            C0Program((snd nVars), List.rev ((C0Return(arg))::nAssigments))
