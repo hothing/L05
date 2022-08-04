@@ -2,6 +2,7 @@
 open R1Interpreter
 open R1Uniquify
 open R1Flatten
+open C0Interpreter
 
 printfn "Hello from F#: Nanopass compiler book exercises"
 
@@ -31,8 +32,9 @@ interpreter prg4 inputs |> printfn "[3]>> %A"
 
 // (program (let ([x (read)]) (let ([y (read)]) (- x y))))
 let prg5 = Program(Let("x", Read, Let("y", Read, Binary(Sub, Var("x"), Var("y")))))
-interpreter prg4 [52; 10] |> printfn "[4]>> %A"
+interpreter prg5 [52; 10] |> printfn "[4]>> %A"
 
+(*
 // uniquify tests 
 uniquify prg |> printfn "[5.0]>> %A"
 uniquify prg2  |> printfn "[5.1]>> %A"
@@ -46,8 +48,23 @@ flatten prg2 |> printfn "[6.1]>> %A"
 flatten prg3 |> printfn "[6.2]>> %A"
 flatten prg4 |> printfn "[6.3]>> %A"
 flatten prg5 |> printfn "[6.4]>> %A"
+*)
 
 // (program (let [x 1] (let [x -x] (let [x (+ x 10)] x))))
 let prg6 = Program(Let("x", EInt 1, Let("x", Unary(Minus, Var("x")), Let("x", Binary(Add, Var("x"), EInt 10), Var("x")))))
 interpreter prg6 [] |> printfn "[7]>> %A"
-flatten prg6 |> printfn "[7.1]>> %A"
+//flatten prg6 |> printfn "[7.1]>> %A"
+
+// C0 interpreter test
+let c0prg, _ = flatten prg
+c0Interpreter c0prg inputs |> printfn "[8.0]>> %A"
+let c0prg2, _ = flatten prg2
+c0Interpreter c0prg2 inputs |> printfn "[8.1]>> %A"
+let c0prg3, _ = flatten prg3
+c0Interpreter c0prg3 inputs |> printfn "[8.2]>> %A"
+let c0prg4, _ = flatten prg4
+c0Interpreter c0prg4 inputs |> printfn "[8.3]>> %A" // BUG: wrong result
+let c0prg5, _ = flatten prg5
+c0Interpreter c0prg5 [52; 10] |> printfn "[8.4]>> %A"
+let c0prg6, _ = flatten prg6
+c0Interpreter c0prg6 [] |> printfn "[8.5]>> %A"

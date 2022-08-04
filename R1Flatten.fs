@@ -29,9 +29,13 @@ module R1Flatten
         | Unary (op, e1) -> 
             //printfn "<unary> = %A" exp 
             let cexp, nAssigments, nVars = r1flatten e1 assigments vars
-            let tname, nVars2 = genName nVars
-            let nAssigments2 = (C0Assign(tname, C0Arg(cexp)))::nAssigments
-            (C0Var(tname), nAssigments2, nVars2)
+            let tname, nVars = genName nVars
+            let stmt = 
+                match op with
+                | Plus -> C0Assign(tname, C0Arg(cexp))
+                | Minus -> C0Assign(tname, C0Minus(cexp))
+            let nAssigments = stmt::nAssigments
+            (C0Var(tname), nAssigments, nVars)
         | Binary (op, e1, e2) -> 
             //printfn "<binary> = %A" exp 
             let arg1, nAssigments, nVars = r1flatten e1 assigments vars
