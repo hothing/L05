@@ -56,15 +56,28 @@ interpreter prg6 [] |> printfn "[7]>> %A"
 //flatten prg6 |> printfn "[7.1]>> %A"
 
 // C0 interpreter test
+(*
 let c0prg, _ = flatten prg
 c0Interpreter c0prg inputs |> printfn "[8.0]>> %A"
 let c0prg2, _ = flatten prg2
 c0Interpreter c0prg2 inputs |> printfn "[8.1]>> %A"
 let c0prg3, _ = flatten prg3
 c0Interpreter c0prg3 inputs |> printfn "[8.2]>> %A"
+*)
 let c0prg4, _ = flatten prg4
-c0Interpreter c0prg4 inputs |> printfn "[8.3]>> %A" // BUG: wrong result
+c0prg4 |> printfn "[8.3]~~ %A"
+c0Interpreter c0prg4 inputs |> printfn "[8.3]>> %A" // BUG: wrong result, because of error in R1Flatten!
+(*
+    (["m.3"; "m.2"; "m.1"; "t.2"; "t.1"],
+    [C0Assign ("t.1", C0Arg (C0Int 32)); 
+    C0Assign ("t.2", C0Arg (C0Int 10));
+    C0Assign ("m.1", C0Arg (C0Var "t.2")); <-- Error #1
+    C0Assign ("m.2", C0Add (C0Var "m.1", C0Var "t.2")); <-- Error #2
+    C0Assign ("m.3", C0Arg (C0Var "m.2")); C0Return (C0Var "m.3")])
+*)
+(*
 let c0prg5, _ = flatten prg5
 c0Interpreter c0prg5 [52; 10] |> printfn "[8.4]>> %A"
 let c0prg6, _ = flatten prg6
 c0Interpreter c0prg6 [] |> printfn "[8.5]>> %A"
+*)
