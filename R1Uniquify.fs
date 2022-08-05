@@ -33,7 +33,7 @@ module R1Uniquify
             let xname = "t." + index.ToString()
             let nMap  = (index, (vname, xname)::(snd map))
             let nExpBody, nMap2 = r1uniquify expBody nMap
-            (Let(xname, nExpInit, nExpBody), nMap2)
+            (Let(xname, nExpInit, nExpBody), map)
         
     let uniquify prg =
         match prg with 
