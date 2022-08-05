@@ -11,6 +11,7 @@
     <Compile Include="R1Flatten.fs" />
     <Compile Include="C0Interpreter.fs" />
     <Compile Include="X0Lang.fs" />
+    <Compile Include="C0Select.fs" />
 	  <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>
