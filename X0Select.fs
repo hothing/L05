@@ -1,10 +1,8 @@
-module C0Select
+module X0Select
     open C0Lang
     open X0Lang
 
-    let c0SelectInstr exp env =
-        X0Program([], [])
-
+    
     (*
         (assign x (+ y z)) ⇒ [(movq (var y) (var x)) ; (addq (var z) (var x))]
         (assign x (+ 10 32)) ⇒ [(movq (int 10) (var x)) ; (addq (int 32) (var x))]
@@ -67,4 +65,30 @@ module C0Select
             hasExpVar exp vname
         | C0Return (_) -> false
 
+    let x0genArg arg =
+        match arg with
+        | C0Int v -> X0Int v
+        | C0Var vname -> X0Var vname
 
+    let x0gen tvar exp =
+        match exp with
+        | C0Add (arg1, arg2) -> 
+            match expVarPos exp tvar with
+            | VP_None -> [MovQ(x0genArg arg1, X0Var tvar); AddQ(x0genArg arg2, X0Var tvar)]
+            | VP_Left -> [AddQ(x0genArg arg2, X0Var tvar)]
+            | VP_Right | VP_Both -> [AddQ(x0genArg arg1, X0Var tvar)]
+        | C0Sub (arg1, arg2) -> 
+            match expVarPos exp tvar with
+            | VP_None -> [MovQ(x0genArg arg1, X0Var tvar); SubQ(x0genArg arg2, X0Var tvar)]
+            | VP_Left | VP_Both -> [SubQ(x0genArg arg2, X0Var tvar)]
+            | VP_Right -> [NegQ(X0Var tvar); AddQ(x0genArg arg1, X0Var tvar)]
+        | _ -> []
+
+    let x0SelectInstr codes stmt env =
+        match stmt with
+        | C0Assign(vname, exp) -> x0gen vname exp
+        | C0Return(vname) -> codes // TODO
+
+    let selectInstruction c0prg =
+        match c0prg with
+        | C0Program (vars, stmt) -> []

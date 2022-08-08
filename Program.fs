@@ -2,13 +2,15 @@
 open R1Interpreter
 open R1Uniquify
 open R1Flatten
+open C0Lang
 open C0Interpreter
+open X0Select
 
 printfn "Hello from F#: Nanopass compiler book exercises"
 
 let inputs = [5]
 
-
+(*
 // (program (- (- (+ 12 -2) (read))))
 let e1 = Binary(Add, EInt 12, EInt -2)
 let e2 = Binary(Sub, e1, Read)
@@ -107,3 +109,18 @@ c0Interpreter c0prg5 [52; 10] |> printfn "[8.4]>> %A"
 
 let c0prg6, _ = flatten prg6
 c0Interpreter c0prg6 [] |> printfn "[8.5]>> %A"
+*)
+
+x0gen "z" (C0Add(C0Var("y"), C0Var("x"))) |> printfn "[X0][0.0] = %A"
+x0gen "x" (C0Add(C0Int(1), C0Int(2))) |> printfn "[X0][0.1] = %A"
+x0gen "x" (C0Add(C0Int(1), C0Var("y"))) |> printfn "[X0][0.2] = %A"
+x0gen "x" (C0Add(C0Var("y"), C0Int(1))) |> printfn "[X0][0.3] = %A"
+x0gen "x" (C0Add(C0Int(1), C0Var("x"))) |> printfn "[X0][0.4] = %A"
+x0gen "x" (C0Add(C0Var("x"), C0Int(1))) |> printfn "[X0][0.5] = %A"
+
+x0gen "z" (C0Sub(C0Var("y"), C0Var("x"))) |> printfn "[X0][1.0] = %A"
+x0gen "x" (C0Sub(C0Int(1), C0Int(2))) |> printfn "[X0][1.1] = %A"
+x0gen "x" (C0Sub(C0Int(1), C0Var("y"))) |> printfn "[X0][1.2] = %A"
+x0gen "x" (C0Sub(C0Var("y"), C0Int(1))) |> printfn "[X0][1.3] = %A"
+x0gen "x" (C0Sub(C0Int(1), C0Var("x"))) |> printfn "[X0][1.4] = %A"
+x0gen "x" (C0Sub(C0Var("x"), C0Int(1))) |> printfn "[X0][1.5] = %A"
