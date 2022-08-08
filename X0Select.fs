@@ -19,6 +19,26 @@ module X0Select
         (assign x (- 10 x)) ⇒ [(addq (int -10) (var x))]
         (assign x (- x 10)) ⇒ [(subq (int 10) (var x))]
         (assign x (- x x)) ⇒ [(subq (var x) (var x))]
+
+        (assign x ('* y z)) ⇒ [(movq (var y) (var x)) ; (mulq (var z) (var x))]
+        (assign x ('* 10 32)) ⇒ [(movq (int 10) (var x)) ; (mulq (int 32) (var x))]
+        (assign x ('* y 10)) ⇒ [(movq (var y) (var x)) ; (mulq (int 10) (var x))]
+        (assign x ('* 10 y)) ⇒ [(movq (int 10) (var x)) ; (mulq (var y) (var x))]
+        (assign x ('* 10 x)) ⇒ [(mulq (int 10) (var x))]
+        (assign x ('* x 10)) ⇒ [(mulq (int 10) (var x))]
+        (assign x ('* x x)) ⇒ [(mulq (var x) (var x))]
+
+        (assign x (/ y z)) ⇒ [(movq (var y) (var x)) ; (divq (var z) (var x))]
+        (assign x (/ 10 32)) ⇒ [(movq (int 10) (var x)) ; (divq (int 32) (var x))]
+        (assign x (/ y 10)) ⇒ [(movq (var y) (var x)) ; (divq (int 10) (var x))]
+        (assign x (/ 10 y)) ⇒ [(movq (int 10) (var x)) ; (divq (var y) (var x))]
+        (assign x (/ 10 x)) ⇒ 
+            [(movq (int 10) (var tmp.0)) ; (divq (var x) (var tmp.0)); (movq (var tmp.0) (var x))]
+            [(pushq (var x)); (movq (int 10) (var x)); (popq (reg a)); (divq (reg a) (var x))]
+        (assign x (/ x 10)) ⇒ [(divq (int 10) (var x))]
+        (assign x (/ x x)) ⇒ 
+            [(divq (var x) (var x))]
+            [(movq (int 1) (var x))]
     *)
 
     type VarPosition = VP_None | VP_Left | VP_Right | VP_Both
@@ -74,21 +94,41 @@ module X0Select
         match exp with
         | C0Add (arg1, arg2) -> 
             match expVarPos exp tvar with
-            | VP_None -> [MovQ(x0genArg arg1, X0Var tvar); AddQ(x0genArg arg2, X0Var tvar)]
-            | VP_Left -> [AddQ(x0genArg arg2, X0Var tvar)]
-            | VP_Right | VP_Both -> [AddQ(x0genArg arg1, X0Var tvar)]
+            | VP_None -> [MovQ(x0genArg arg1, X0TVar tvar); AddQ(x0genArg arg2, X0TVar tvar)]
+            | VP_Left -> [AddQ(x0genArg arg2, X0TVar tvar)]
+            | VP_Right | VP_Both -> [AddQ(x0genArg arg1, X0TVar tvar)]
         | C0Sub (arg1, arg2) -> 
             match expVarPos exp tvar with
-            | VP_None -> [MovQ(x0genArg arg1, X0Var tvar); SubQ(x0genArg arg2, X0Var tvar)]
-            | VP_Left | VP_Both -> [SubQ(x0genArg arg2, X0Var tvar)]
-            | VP_Right -> [NegQ(X0Var tvar); AddQ(x0genArg arg1, X0Var tvar)]
-        | _ -> []
+            | VP_None -> [MovQ(x0genArg arg1, X0TVar tvar); SubQ(x0genArg arg2, X0TVar tvar)]
+            | VP_Left | VP_Both -> [SubQ(x0genArg arg2, X0TVar tvar)]
+            | VP_Right -> [NegQ(X0TVar tvar); AddQ(x0genArg arg1, X0TVar tvar)]
+        | C0Minus arg -> 
+            match expVarPos exp tvar with
+            | VP_None -> [MovQ(x0genArg arg, X0TVar tvar); NegQ(X0TVar tvar)]
+            | _ -> [NegQ(X0TVar tvar)]
+        | C0Mul (arg1, arg2) -> 
+            match expVarPos exp tvar with
+            | VP_None -> [MovQ(x0genArg arg1, X0TVar tvar); MulQ(x0genArg arg2, X0TVar tvar)]
+            | VP_Left -> [MulQ(x0genArg arg2, X0TVar tvar)]
+            | VP_Right | VP_Both -> [MulQ(x0genArg arg1, X0TVar tvar)]
+        | C0Div (arg1, arg2) -> 
+            match expVarPos exp tvar with
+            | VP_None -> [MovQ(x0genArg arg1, X0TVar tvar); DivQ(x0genArg arg2, X0TVar tvar)]
+            | VP_Left | VP_Both -> [DivQ(x0genArg arg2, X0TVar tvar)]
+            | VP_Right -> [MovQ(X0Var tvar, X0TReg Rax); DivQ(x0genArg arg1, X0TReg Rax); MovQ(X0Reg Rax, X0TVar tvar)]
+        | C0Read ->
+            [CallQ "read_int"; MovQ(X0Reg Rax, X0TVar tvar)]
+        | C0Arg arg ->
+            match expVarPos exp tvar with
+            | VP_None -> [MovQ(x0genArg arg, X0TVar tvar)]
+            | _ -> []
 
-    let x0SelectInstr codes stmt env =
+    let x0SelectInstr stmt =
         match stmt with
         | C0Assign(vname, exp) -> x0gen vname exp
-        | C0Return(vname) -> codes // TODO
+        | C0Return(arg) -> [MovQ(x0genArg arg, X0TReg Rax)]
 
     let selectInstruction c0prg =
         match c0prg with
-        | C0Program (vars, stmt) -> []
+        | C0Program (vars, stmts) ->            
+            X0Program(vars, List.collect x0SelectInstr stmts)
