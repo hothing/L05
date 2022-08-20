@@ -132,3 +132,22 @@ module X0Select
         match c0prg with
         | C0Program (vars, stmts) ->            
             X0Program(vars, List.collect x0SelectInstr stmts)
+ 
+    
+    let rec x0reduct reductor nStmts stmts =
+        match stmts with
+        | instr1::tStmts -> 
+            match tStmts with 
+            | instr2::rStmts -> 
+                let res = reductor instr1 instr2
+                match res with
+                | Some(r) -> x0reduct reductor nStmts (r::rStmts)
+                | None -> x0reduct reductor (nStmts@[instr1]) tStmts
+            | [] -> nStmts@[instr1]
+        | [] -> nStmts
+
+    let reduction reductor x0prg =
+        match x0prg with
+        | X0Program (vars, stmts) ->            
+            X0Program(vars, x0reduct reductor [] stmts)
+ 

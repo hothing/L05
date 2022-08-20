@@ -4,6 +4,7 @@ open R1Uniquify
 open R1Flatten
 open C0Lang
 open C0Interpreter
+open X0Lang
 open X0Select
 
 printfn "Hello from F#: Nanopass compiler book exercises"
@@ -114,72 +115,25 @@ let c0prg6, _ = flatten prg6
 c0Interpreter c0prg6 [] |> printfn "[8.5]>> %A"
 *)
 
-(*
-x0gen "z" (C0Add(C0Var("y"), C0Var("x"))) |> printfn "[X0][0.0] = %A"
-x0gen "x" (C0Add(C0Int(1), C0Int(2))) |> printfn "[X0][0.1] = %A"
-x0gen "x" (C0Add(C0Int(1), C0Var("y"))) |> printfn "[X0][0.2] = %A"
-x0gen "x" (C0Add(C0Var("y"), C0Int(1))) |> printfn "[X0][0.3] = %A"
-x0gen "x" (C0Add(C0Int(1), C0Var("x"))) |> printfn "[X0][0.4] = %A"
-x0gen "x" (C0Add(C0Var("x"), C0Int(1))) |> printfn "[X0][0.5] = %A"
-
-x0gen "z" (C0Sub(C0Var("y"), C0Var("x"))) |> printfn "[X0][1.0] = %A"
-x0gen "x" (C0Sub(C0Int(1), C0Int(2))) |> printfn "[X0][1.1] = %A"
-x0gen "x" (C0Sub(C0Int(1), C0Var("y"))) |> printfn "[X0][1.2] = %A"
-x0gen "x" (C0Sub(C0Var("y"), C0Int(1))) |> printfn "[X0][1.3] = %A"
-x0gen "x" (C0Sub(C0Int(1), C0Var("x"))) |> printfn "[X0][1.4] = %A"
-x0gen "x" (C0Sub(C0Var("x"), C0Int(1))) |> printfn "[X0][1.5] = %A"
-
-x0gen "z" (C0Div(C0Var("y"), C0Var("x"))) |> printfn "[X0][3.0] = %A"
-x0gen "x" (C0Div(C0Int(1), C0Int(2))) |> printfn "[X0][3.1] = %A"
-x0gen "x" (C0Div(C0Int(1), C0Var("y"))) |> printfn "[X0][3.2] = %A"
-x0gen "x" (C0Div(C0Var("y"), C0Int(1))) |> printfn "[X0][3.3] = %A"
-x0gen "x" (C0Div(C0Int(1), C0Var("x"))) |> printfn "[X0][3.4] = %A"
-x0gen "x" (C0Div(C0Var("x"), C0Int(1))) |> printfn "[X0][3.5] = %A"
-
-x0gen "z" (C0Minus(C0Var("y"))) |> printfn "[X0][4.0] = %A"
-x0gen "y" (C0Minus(C0Var("y"))) |> printfn "[X0][4.1] = %A"
-x0gen "z" (C0Minus(C0Int(1))) |> printfn "[X0][4.2] = %A"
-
-x0gen "z" (C0Read) |> printfn "[X0][5.0] = %A"
-
-x0gen "y" (C0Arg(C0Var("z"))) |> printfn "[X0][6.0] = %A"
-x0gen "y" (C0Arg(C0Var("y"))) |> printfn "[X0][6.1] = %A"
-x0gen "z" (C0Arg(C0Int(1))) |> printfn "[X0][6.2] = %A"
-*)
-
-let c0prg6, _ = flatten prg6
+let c0prg6 = flatten prg6
 prg6 |> printfn "[X0][10.0] ~~> %A"
 c0prg6 |> printfn "[X0][10.0] -> %A"
-selectInstruction c0prg6 |> printfn "[X0][10.0] = %A"
+let x0prg6 = selectInstruction c0prg6 
+x0prg6 |> printfn "[X0][10.0] = %A"
 
-(*
-    (Let
-     ("x", EInt 1,
-      Let
-        ("x", Unary (Minus, Var "x"),
-         Let ("x", Binary (Add, Var "x", EInt 10), Var "x"))))
-    ---------------
-    (["m.5"; "m.4"; "m.3"; "t.3"; "m.2"; "t.2"; "m.1"; "t.1"],
-   [C0Assign ("t.1", C0Arg (C0Int 1)); 
-    C0Assign ("m.1", C0Minus (C0Var "t.1"));
-    C0Assign ("t.2", C0Arg (C0Var "m.1"));
-    C0Assign ("m.2", C0Add (C0Var "t.2", C0Int 10));
-    C0Assign ("t.3", C0Arg (C0Var "m.2")); 
-    C0Assign ("m.3", C0Arg (C0Var "t.3"));
-    C0Assign ("m.4", C0Arg (C0Var "m.3")); 
-    C0Assign ("m.5", C0Arg (C0Var "m.4"));
-    C0Return (C0Var "m.5")])
-    --------------
-    (["m.5"; "m.4"; "m.3"; "t.3"; "m.2"; "t.2"; "m.1"; "t.1"],
-   [MovQ (X0Int 1, X0TVar "t.1"); 
-    MovQ (X0Var "t.1", X0TVar "m.1");
-    NegQ (X0TVar "m.1"); 
-    MovQ (X0Var "m.1", X0TVar "t.2");
-    MovQ (X0Var "t.2", X0TVar "m.2"); 
-    AddQ (X0Int 10, X0TVar "m.2");
-    MovQ (X0Var "m.2", X0TVar "t.3"); 
-    MovQ (X0Var "t.3", X0TVar "m.3");
-    MovQ (X0Var "m.3", X0TVar "m.4"); 
-    MovQ (X0Var "m.4", X0TVar "m.5");
-    MovQ (X0Var "m.5", X0TReg Rax)])
-*)
+let moveRed instr1 instr2 =
+    match (instr1, instr2) with
+    | (MovQ(arg1, cell1), MovQ(arg2, cell2)) -> 
+        match cell1, arg2 with 
+        | (X0TVar(tvar), X0Var(svar)) -> 
+            if tvar = svar then Some(MovQ(arg1, cell2))
+            else None
+        | _ -> None
+    | _ -> None
+
+reduction moveRed x0prg6 |> printfn "%A"
+
+prg2 |> flatten |> selectInstruction |> reduction moveRed |> printfn "[Z2] %A"
+prg3 |> flatten |> selectInstruction |> reduction moveRed |> printfn "[Z3] %A"
+prg4 |> flatten |> selectInstruction |> reduction moveRed |> printfn "[Z4] %A"
+prg5 |> flatten |> selectInstruction |> reduction moveRed |> printfn "[Z5] %A"
