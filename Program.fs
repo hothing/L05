@@ -6,6 +6,7 @@ open C0Lang
 open C0Interpreter
 open X0Lang
 open X0Select
+open X0Patch
 
 printfn "Hello from F#: Nanopass compiler book exercises"
 
@@ -128,12 +129,15 @@ let moveRed instr1 instr2 =
         | (X0TVar(tvar), X0Var(svar)) -> 
             if tvar = svar then Some(MovQ(arg1, cell2))
             else None
+        | (X0TDeref(treg, tofs), X0Deref(sreg, sofs)) ->
+            if (treg = sreg) && (tofs = sofs) then Some(MovQ(arg1, cell2))
+            else None
         | _ -> None
     | _ -> None
 
 reduction moveRed x0prg6 |> printfn "%A"
 
-prg2 |> flatten |> selectInstruction |> reduction moveRed |> printfn "[Z2] %A"
-prg3 |> flatten |> selectInstruction |> reduction moveRed |> printfn "[Z3] %A"
-prg4 |> flatten |> selectInstruction |> reduction moveRed |> printfn "[Z4] %A"
-prg5 |> flatten |> selectInstruction |> reduction moveRed |> printfn "[Z5] %A"
+prg2 |> flatten |> selectInstruction |> reduction moveRed |> patching |> printfn "[Z2] %A"
+prg3 |> flatten |> selectInstruction |> reduction moveRed |> patching |> printfn "[Z3] %A"
+prg4 |> flatten |> selectInstruction |> reduction moveRed |> patching |> printfn "[Z4] %A"
+prg5 |> flatten |> selectInstruction |> reduction moveRed |> patching |> printfn "[Z5] %A"
