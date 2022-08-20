@@ -8,6 +8,7 @@ open X0Lang
 open X0Select
 open X0Patch
 open X0Homes
+open X0Print
 
 printfn "Hello from F#: Nanopass compiler book exercises"
 
@@ -138,9 +139,20 @@ let moveRed instr1 instr2 =
 
 reduction moveRed x0prg6 |> printfn "%A"
 
-prg2 |> flatten |> selectInstruction |> reduction moveRed |> patching |> printfn "[Z2] %A"
-prg3 |> flatten |> selectInstruction |> reduction moveRed |> patching |> printfn "[Z3] %A"
-prg4 |> flatten |> selectInstruction |> reduction moveRed |> patching |> printfn "[Z4] %A"
-prg5 |> flatten |> selectInstruction |> reduction moveRed |> patching |> printfn "[Z5] %A"
+prg2 |> flatten |> selectInstruction 
+     |> reduction moveRed |> patching |>  assignHomes Rbp 0 
+     |> snd |> print
+     |> printfn "[Z2] %A"
+prg3 |> flatten |> selectInstruction 
+     |> reduction moveRed |> patching |>  assignHomes Rbp 0 
+     |> snd |> print
+     |> printfn "[Z3] %A"
+prg4 |> flatten |> selectInstruction 
+     |> reduction moveRed |> patching |>  assignHomes Rbp 0 
+     |> snd |> print
+     |> printfn "[Z4] %A"
+prg5 |> flatten |> selectInstruction 
+     |> reduction moveRed |> patching |>  assignHomes Rbp 0 
+     |> snd |> print
+     |> printfn "[Z5] %A"
 
-prg5 |> flatten |> selectInstruction |> reduction moveRed |> patching |>  assignHomes Rbp 0 |> printfn "[W5] %A"

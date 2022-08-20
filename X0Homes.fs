@@ -18,7 +18,8 @@ module X0Homes
         | v::rest -> 
             let dr = mapper baseOffset v
             let nOffset, nR = dr
-            genHomes mapper nOffset ((v, dr)::nVars) rest
+            let vMap = (v, (-nOffset, nR))
+            genHomes mapper nOffset (vMap::nVars) rest
         | [] -> (baseOffset, nVars)
 
     let x0assignHomes baseReg baseOffset vars stmts =
