@@ -7,6 +7,7 @@ open C0Interpreter
 open X0Lang
 open X0Select
 open X0Patch
+open X0Homes
 
 printfn "Hello from F#: Nanopass compiler book exercises"
 
@@ -141,3 +142,5 @@ prg2 |> flatten |> selectInstruction |> reduction moveRed |> patching |> printfn
 prg3 |> flatten |> selectInstruction |> reduction moveRed |> patching |> printfn "[Z3] %A"
 prg4 |> flatten |> selectInstruction |> reduction moveRed |> patching |> printfn "[Z4] %A"
 prg5 |> flatten |> selectInstruction |> reduction moveRed |> patching |> printfn "[Z5] %A"
+
+prg5 |> flatten |> selectInstruction |> reduction moveRed |> patching |>  assignHomes Rbp 0 |> printfn "[W5] %A"

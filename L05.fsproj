@@ -13,6 +13,7 @@
     <Compile Include="X0Lang.fs" />
     <Compile Include="X0Select.fs" />
     <Compile Include="X0Patch.fs" />
+    <Compile Include="X0Homes.fs" />
 	  <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>
