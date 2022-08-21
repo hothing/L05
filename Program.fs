@@ -9,6 +9,7 @@ open X0Select
 open X0Patch
 open X0Homes
 open X0Print
+open X0Spill
 
 printfn "Hello from F#: Nanopass compiler book exercises"
 
@@ -118,6 +119,10 @@ let c0prg6, _ = flatten prg6
 c0Interpreter c0prg6 [] |> printfn "[8.5]>> %A"
 *)
 
+let tie f x =
+    f x
+    x
+
 let c0prg6 = flatten prg6
 prg6 |> printfn "[X0][10.0] ~~> %A"
 c0prg6 |> printfn "[X0][10.0] -> %A"
@@ -153,6 +158,59 @@ prg4 |> flatten |> selectInstruction
      |> printfn "[Z4] %A"
 prg5 |> flatten |> selectInstruction 
      |> reduction moveRed |> patching |>  assignHomes Rbp 0 
+     |> tie (printfn "[W5] %A")
      |> snd |> print
      |> printfn "[Z5] %A"
 
+(*
+    (program (v w x y z t.1 t.2)
+(movq (int 1) (var v))
+(movq (int 46) (var w))
+(movq (var v) (var x))
+(addq (int 7) (var x))
+(movq (var x) (var y))
+(addq (int 4) (var y))
+(movq (var x) (var z))
+(addq (var w) (var z))
+(movq (var y) (var t.1))
+(negq (var t.1))
+(movq (var z) (var t.2))
+(addq (var t.1) (var t.2))
+(movq (var t.2) (reg rax)))
+*)
+let x0prg = X0Program(["v"; "w"; "x"; "y"; "z"; "t.1"; "t.2"], [
+    MovQ(X0Int 1, X0TVar "v");
+    MovQ(X0Int 46, X0TVar "w");
+    MovQ(X0Var "v", X0TVar "x");
+    AddQ(X0Int 7, X0TVar "x");
+    MovQ(X0Var "x", X0TVar "y");
+    AddQ(X0Int 4, X0TVar "y");
+    MovQ(X0Var "x", X0TVar "z");
+    AddQ(X0Var "w", X0TVar "z");
+    MovQ(X0Var "y", X0TVar "t.1");
+    NegQ(X0TVar "t.1");
+    MovQ(X0Var "z", X0TVar "t.2");
+    AddQ(X0Var "t.1", X0TVar "t.2");
+    MovQ(X0Var "t.2", X0TReg Rax);
+]) 
+
+match x0prg with
+| X0Program(vars, stmts) -> x0spilling (Set.empty) stmts |> printfn "[V5] %A"
+
+(*
+    [
+        (MovQ (X0Int 1, X0TVar "v"), set [X0RV "v"; X0RNone]);
+        (MovQ (X0Int 46, X0TVar "w"), set [X0RV "v"; X0RV "w"; X0RNone]);
+        (MovQ (X0Var "v", X0TVar "x"), set [X0RV "w"; X0RNone]);
+        (AddQ (X0Int 7, X0TVar "x"), set [X0RV "w"; X0RV "x"; X0RNone]);
+        (MovQ (X0Var "x", X0TVar "y"), set [X0RV "w"; X0RV "x"; X0RNone]);
+        (AddQ (X0Int 4, X0TVar "y"), set [X0RV "w"; X0RV "x"; X0RV "y"]);
+        (MovQ (X0Var "x", X0TVar "z"), set [X0RV "w"; X0RV "y"]);
+        (AddQ (X0Var "w", X0TVar "z"), set [X0RV "y"; X0RV "z"]);
+        (MovQ (X0Var "y", X0TVar "t.1"), set [X0RV "z"]);
+        (NegQ (X0TVar "t.1"), set [X0RV "t.1"; X0RV "z"]);
+        (MovQ (X0Var "z", X0TVar "t.2"), set [X0RV "t.1"]);
+        (AddQ (X0Var "t.1", X0TVar "t.2"), set [X0RV "t.2"]);
+        (MovQ (X0Var "t.2", X0TReg Rax), set [])
+    ]
+*)
