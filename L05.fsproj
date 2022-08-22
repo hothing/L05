@@ -15,6 +15,8 @@
     <Compile Include="X0Patch.fs" />
     <Compile Include="X0Homes.fs" />
     <Compile Include="X0Print.fs" />
+    <Compile Include="X0Spill.fs" />
+    <Compile Include="InGraph.fs" />
 	  <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>
