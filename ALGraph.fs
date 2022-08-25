@@ -30,16 +30,8 @@ module ALGraph
         // E(A), ~E(B) -> add vertice B, and then do the narmal procedure
         // ~E(A), ~(B) -> add vertice A, add vertice B and then do the narmal procedure
         // E(A), E(B) -> a normal procedure: add B to adjacent list of A, add A to adjacent list of B
-        let nGraph = 
-            if not (Map.containsKey verticeA aGraph) then
-                Map.add verticeA (Set.singleton verticeB) aGraph
-            else 
-                aGraph
-        let nGraph = 
-            if not (Map.containsKey verticeB nGraph) then
-                Map.add verticeA (Set.singleton verticeA) nGraph
-            else 
-                nGraph
+        let nGraph = addVertice verticeA aGraph
+        let nGraph = addVertice verticeB nGraph
         let modifyAL vertice x = 
             match x with 
             | Some(al) -> Some(Set.add vertice al) 

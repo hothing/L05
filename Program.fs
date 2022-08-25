@@ -10,7 +10,7 @@ open X0Patch
 open X0Homes
 open X0Print
 open X0Spill
-open InGraph
+open ALGraph
 
 printfn "Hello from F#: Nanopass compiler book exercises"
 
@@ -217,3 +217,19 @@ match x0prg with
 *)
 
 
+match x0prg with
+| X0Program(vars, stmts) -> 
+    x0spilling (Set.empty) stmts |> fst |> x0makeInterGraph |> printfn "[V5.1] %A"
+
+(*
+    [
+        (X0RV "t.1", set [X0RV "t.2"; X0RV "z"]); 
+        (X0RV "t.2", set [X0RV "t.1"]);
+        (X0RV "v", set [X0RV "w"]);
+        (X0RV "w", set [X0RV "v"; X0RV "x"; X0RV "y"; X0RV "z"]);
+        (X0RV "x", set [X0RV "w"; X0RV "y"]);
+        (X0RV "y", set [X0RV "w"; X0RV "x"; X0RV "z"]);
+        (X0RV "z", set [X0RV "t.1"; X0RV "w"; X0RV "y"]); 
+        (X0RNone, set [])
+    ]
+*)

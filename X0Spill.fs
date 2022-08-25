@@ -1,6 +1,7 @@
 module X0Spill
 
     open X0Lang
+    open ALGraph
 
     (*
         and X0Arg = X0Int of int | X0Reg of X0Register | X0Deref of X0Register * int | X0Var of X0Variable
@@ -26,21 +27,23 @@ module X0Spill
         | X0TDeref (reg, offs) -> X0RD(reg, offs) 
         | X0TVar (vname) -> X0RV(vname)
 
+    let includeRef ref liveArea =
+        if ref <> X0RNone then Set.add ref liveArea else liveArea
+    
+    let excludeRef ref liveArea =
+        if ref <> X0RNone then Set.remove ref liveArea else liveArea
+
     let x0stmtSpill stmt liveArea =
-        let includeArg arg liveArea =
-            if arg <> X0RNone then Set.add arg liveArea else liveArea
-        let excludeCell cell liveArea =
-            if cell <> X0RNone then Set.remove cell liveArea else liveArea
         match stmt with 
         | MovQ(arg, cell) ->
-            liveArea|> excludeCell (cellToRef cell) |> includeArg (argToRef arg)
-        | AddQ(arg, cell) -> liveArea|> includeArg (argToRef arg)
-        | SubQ(arg, cell) -> liveArea|> includeArg (argToRef arg)
-        | MulQ(arg, cell) -> liveArea|> includeArg (argToRef arg)
-        | DivQ(arg, cell) -> liveArea|> includeArg (argToRef arg)
+            liveArea|> excludeRef (cellToRef cell) |> includeRef (argToRef arg)
+        | AddQ(arg, cell) -> liveArea|> includeRef (argToRef arg)
+        | SubQ(arg, cell) -> liveArea|> includeRef (argToRef arg)
+        | MulQ(arg, cell) -> liveArea|> includeRef (argToRef arg)
+        | DivQ(arg, cell) -> liveArea|> includeRef (argToRef arg)
         | NegQ(cell) -> liveArea
-        | PushQ(arg) -> liveArea|> includeArg (argToRef arg)
-        | PopQ(cell) -> liveArea|> excludeCell (cellToRef cell)
+        | PushQ(arg) -> liveArea|> includeRef (argToRef arg)
+        | PopQ(cell) -> liveArea|> excludeRef (cellToRef cell)
         | _ -> liveArea
 
     let x0spilling liveArea stmts  =
@@ -48,3 +51,37 @@ module X0Spill
             let lx = x0stmtSpill stmt la
             ((stmt, la), lx)
         List.mapFoldBack stSpill stmts liveArea
+
+    let x0interference stmt liveArea aGraph = 
+        let addIFR rS rD g rV = 
+                if (rV <> rS) && (rV <> rD) then 
+                    addEdge rD rV g
+                else 
+                    g
+        match stmt with 
+        | MovQ(arg, cell) ->            
+            Set.fold (addIFR (argToRef arg) (cellToRef cell)) aGraph liveArea            
+        | AddQ(arg, cell)
+        | SubQ(arg, cell)
+        | MulQ(arg, cell)
+        | DivQ(arg, cell) -> 
+            let refC = (cellToRef cell)
+            Set.fold (addIFR refC refC) aGraph liveArea
+        | NegQ(cell) -> 
+            let refC = (cellToRef cell)
+            Set.fold (addIFR refC refC) aGraph liveArea
+        | PushQ(arg) -> 
+            // WARNING! May be not right, to be clarify
+            aGraph
+        | PopQ(cell) -> 
+            // WARNING! May be not right, to be clarify
+            let refC = (cellToRef cell)
+            Set.fold (addIFR refC refC) aGraph liveArea
+        | CallQ(fname) -> 
+            // FIXME: the reference registor is HARDCODED! The mapping function must be used.
+            Set.fold (fun g rV -> addEdge (X0RR Rax) rV g) aGraph liveArea
+        | _ -> aGraph
+
+    let x0makeInterGraph agStmts =
+        List.fold (fun g x -> x0interference (fst x) (snd x) g) (makeGraph [X0RNone]) agStmts
+    
