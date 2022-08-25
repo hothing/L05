@@ -11,6 +11,7 @@ open X0Homes
 open X0Print
 open X0Spill
 open ALGraph
+open GraphColoring
 
 printfn "Hello from F#: Nanopass compiler book exercises"
 
@@ -217,9 +218,11 @@ match x0prg with
 *)
 
 
-match x0prg with
-| X0Program(vars, stmts) -> 
-    x0spilling (Set.empty) stmts |> fst |> x0makeInterGraph |> printfn "[V5.1] %A"
+let g1 = match x0prg with
+            | X0Program(vars, stmts) -> 
+                x0spilling (Set.empty) stmts |> fst |> x0makeInterGraph 
+    
+g1 |> printfn "[V5.1] %A"
 
 (*
     [
@@ -233,3 +236,11 @@ match x0prg with
         (X0RNone, set [])
     ]
 *)
+
+let gc1 = makeColoredGraph 0 g1
+
+gc1 
+|> setColor 1 (X0RV "w") 
+|> setColor 2 (X0RV "y") 
+|> saturation 0 (X0RV "z") 
+|> printfn "[V5.2] %A"
