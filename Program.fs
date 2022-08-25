@@ -216,6 +216,4 @@ match x0prg with
     ]
 *)
 
-let g1 = make_graph [X0RV "w"; X0RV "x"; X0RV "y"]
-g1 |> printfn "[IG0.0] %A"
-g1 |> add_edge (X0RV "w") (X0RV "y") |> printfn "[IG0.1] %A"
+
