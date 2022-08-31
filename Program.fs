@@ -242,5 +242,5 @@ let gc1 = makeColoredGraph 0 g1
 gc1 
 |> setColor 1 (X0RV "w") 
 |> setColor 2 (X0RV "y") 
-|> saturation 0 (X0RV "z") 
+|> saturation (X0RV "z") 
 |> printfn "[V5.2] %A"

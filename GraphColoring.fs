@@ -1,45 +1,63 @@
 module GraphColoring 
 
     open ALGraph
+   
+    let nonColor = 0
 
-    let colorsAlgebra nonColor colorsCount =
-        let allColors = Set [ for i in (nonColor + 1) .. colorsCount -> i ]
-        let validColor color =
-            Set.contains color allColors
-        let includeColor color colorsSet =
-            if validColor color then
-                Set.add color colorsSet
-            else
-                colorsSet
-        let excludeColor color colorsSet = Set.remove color colorsSet
-        let complementColors = Set.difference allColors
-        (validColor, includeColor, excludeColor, complementColors)
-
-    let makeColoredGraph nonColor aGraph  =
+    let makeColoredGraph countColors aGraph  =
         let colorMap = Map.map (fun k v -> nonColor) aGraph
-        (colorMap, aGraph)
+        (aGraph, colorMap, Set [for c in nonColor + 1 .. countColors -> c])
 
-    let setColor aColor aVrtice aColoredGraph =
-        let colorMap, aGraph = aColoredGraph
-        let nColormap = Map.change aVrtice (fun x -> match x with Some(color) -> Some(aColor) | None -> None) colorMap
-        (nColormap, aGraph)
+    let isValidColor aColor allColors =
+        Set.contains aColor allColors
 
-    let color aVrtice aColoredGraph =
-        let colorMap, aGraph = aColoredGraph
-        Map.find aVrtice colorMap
+    let getColorMap aColoredGraph =
+        let aGraph, aColorMap, allColors = aColoredGraph
+        aColorMap
 
-    let color2 aVrtice aColoredGraph =
-        let colorMap, aGraph = aColoredGraph
-        Map.tryFind aVrtice colorMap
-
-    let adjacentColors validColor vertice aColoredGraph =
-        let colorMap, aGraph = aColoredGraph
-        let adjVx = adjacents vertice aGraph
-        let colors = Set.map (fun v -> Map.find v colorMap) adjVx
-        (Set.filter (fun c -> not (validColor c)) colors)
+    let changeColorMap aColorMap aColoredGraph  =
+        let aGraph, _, allColors = aColoredGraph
+        if Map.forall (fun k v -> isValidColor v allColors) aColorMap then
+            (aGraph, aColorMap, allColors)
+        else
+            invalidArg (nameof aColorMap) "A colormap has invalid color(s)"
     
-    let saturation validColor vertice aColoredGraph =
-        Set.count (adjacentColors validColor vertice aColoredGraph)
+    let setColor aColor aVertice aColoredGraph =
+        let aGraph, colorMap, allColors = aColoredGraph
+        if isValidColor aColor allColors then
+            let nColormap = Map.change aVertice (fun x -> match x with Some(aColor) -> Some(aColor) | None -> None) colorMap
+            changeColorMap nColormap aColoredGraph
+        else
+            invalidArg (nameof aColor) (sprintf "A color is invalid -> %A" aColor) 
+
+    let unsetColor aVertice aColoredGraph =
+        let colorMap = getColorMap aColoredGraph
+        let nColormap = Map.change aVertice (fun x -> match x with Some(aColor) -> Some(nonColor) | None -> None) colorMap
+        changeColorMap nColormap aColoredGraph
+    
+    let color aVertice aColoredGraph =
+        let colorMap = getColorMap aColoredGraph
+        Map.find aVertice colorMap
+
+    let color2 aVertice aColoredGraph =
+        let colorMap = getColorMap aColoredGraph
+        Map.tryFind aVertice colorMap
+
+    let adjacentColors aVertice aColoredGraph =
+        let aGraph, aColorMap, _  = aColoredGraph
+        let adjVx = adjacents aVertice aGraph
+        let colors = Set.map (fun v -> Map.find v aColorMap) adjVx
+        (Set.filter (fun c -> c <> nonColor) colors)
+    
+    let adjacentColorsExt aVertice aColoredGraph =
+        let aGraph, aColorMap, allColors  = aColoredGraph
+        let adjVx = adjacents aVertice aGraph
+        let colors = Set.map (fun v -> Map.find v aColorMap) adjVx
+        let theColors = (Set.filter (fun c -> c <> nonColor) colors)
+        (theColors, Set.difference allColors theColors)
+
+    let saturation vertice aColoredGraph =
+        Set.count (adjacentColors vertice aColoredGraph)
     
 
     

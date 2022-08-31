@@ -18,6 +18,7 @@
     <Compile Include="ALGraph.fs" />
     <Compile Include="GraphColoring.fs" />
 	  <Compile Include="X0Spill.fs" />
-    <Compile Include="Program.fs" />
+    <Compile Include="ColorAlgebra.fs" />
+	  <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>
