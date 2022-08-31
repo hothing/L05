@@ -17,7 +17,7 @@ module GraphColoring
 
     let changeColorMap aColorMap aColoredGraph  =
         let aGraph, _, allColors = aColoredGraph
-        if Map.forall (fun k v -> isValidColor v allColors) aColorMap then
+        if Map.forall (fun k v -> (isValidColor v allColors) || (v = nonColor)) aColorMap then
             (aGraph, aColorMap, allColors)
         else
             invalidArg (nameof aColorMap) "A colormap has invalid color(s)"
