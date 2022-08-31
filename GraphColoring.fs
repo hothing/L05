@@ -23,25 +23,22 @@ module GraphColoring
             invalidArg (nameof aColorMap) "A colormap has invalid color(s)"
     
     let setColor aColor aVertice aColoredGraph =
-        let aGraph, colorMap, allColors = aColoredGraph
+        let _, colorMap, allColors = aColoredGraph
         if isValidColor aColor allColors then
-            let nColormap = Map.change aVertice (fun x -> match x with Some(aColor) -> Some(aColor) | None -> None) colorMap
+            let nColormap = Map.change aVertice (fun x -> match x with Some(_) -> Some(aColor) | None -> None) colorMap
             changeColorMap nColormap aColoredGraph
         else
             invalidArg (nameof aColor) (sprintf "A color is invalid -> %A" aColor) 
 
     let unsetColor aVertice aColoredGraph =
-        let colorMap = getColorMap aColoredGraph
-        let nColormap = Map.change aVertice (fun x -> match x with Some(aColor) -> Some(nonColor) | None -> None) colorMap
+        let nColormap = Map.change aVertice (fun x -> match x with Some(_) -> Some(nonColor) | None -> None) (getColorMap aColoredGraph)
         changeColorMap nColormap aColoredGraph
     
     let color aVertice aColoredGraph =
-        let colorMap = getColorMap aColoredGraph
-        Map.find aVertice colorMap
+        Map.find aVertice (getColorMap aColoredGraph)
 
     let color2 aVertice aColoredGraph =
-        let colorMap = getColorMap aColoredGraph
-        Map.tryFind aVertice colorMap
+        Map.tryFind aVertice (getColorMap aColoredGraph)
 
     let adjacentColors aVertice aColoredGraph =
         let aGraph, aColorMap, _  = aColoredGraph

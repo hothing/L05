@@ -242,6 +242,6 @@ let gc1 = makeColoredGraph 9 g1
 gc1 
 |> setColor 1 (X0RV "w") 
 |> setColor 2 (X0RV "y") 
-|> tie (printfn ">>> %A")
+|> tie (fun g -> adjacentColorsExt (X0RV "z") g |> printfn "$>> %A")
 |> saturation (X0RV "z") 
 |> printfn "[V5.2] %A"
