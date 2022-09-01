@@ -245,3 +245,5 @@ gc1
 |> tie (fun g -> adjacentColorsExt (X0RV "z") g |> printfn "$>> %A")
 |> saturation (X0RV "z") 
 |> printfn "[V5.2] %A"
+
+coloring gc1 |> printfn "[V5.3] %A"

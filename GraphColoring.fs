@@ -56,20 +56,6 @@ module GraphColoring
     let saturation vertice aColoredGraph =
         Set.count (adjacentColors vertice aColoredGraph)
     
-
-    let coloring aColoredGraph =
-        let aGraph, _, allColors  = aColoredGraph
-        // reset the color map
-        let colorMap = Map.map (fun k v -> nonColor) aGraph
-        let fxColoring vertice color = 
-            let uc, cc = adjacentColorsExt vertice aColoredGraph
-            let saturation = Set.count uc
-            let minColor = Set.minElement cc
-            0
-        let nColorMap = Map.map (fun v color -> color) colorMap        
-        changeColorMap nColorMap aColoredGraph
-
-
     let adjacentColors0 aVertice aColorMap aGraph =
         let adjVx = adjacents aVertice aGraph
         let colors = Set.map (fun v -> Map.find v aColorMap) adjVx
@@ -89,3 +75,8 @@ module GraphColoring
             doColorization allColors (Set.remove selVertice verticies) nColorMap aGraph
         else
             aColorMap 
+
+    let coloring aColoredGraph =
+        let aGraph, aColorMap, allColors = aColoredGraph
+        doColorization allColors (Map.keys aGraph |> Set) aColorMap aGraph
+
