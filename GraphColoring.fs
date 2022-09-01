@@ -77,11 +77,15 @@ module GraphColoring
 
     let rec doColorization allColors verticies aColorMap aGraph =
         if not (Set.isEmpty verticies) then
-            let adjMat = Set.map (fun v -> adjacentColors0 v aColorMap aGraph) verticies
-            let scMap = Set.map (fun vx -> (Set.count vx, Set.minElement (Set.difference allColors vx))) adjMat
-            let satMap = Set.map (fun x -> (fst x)) scMap
-            let highSat = Set.maxElement satMap
-            let sat = Set.filter (fun x -> (fst x) = highSat) scMap
-            aColorMap
+            let getEnv v =
+                let vx = adjacentColors0 v aColorMap aGraph
+                (Set.count vx, Set.minElement (Set.difference allColors vx))
+        
+            let adjMat = Map (List.map (fun v -> (v, getEnv v)) (Set.toList verticies))
+            let highestSat = Map.values adjMat |> Seq.toList |> List.map (fun x -> (fst x)) |> List.max
+            let selVertice = Map.pick (fun v env -> if (fst env) >= highestSat then Some(v) else None) adjMat
+            let _, newColor = Map.find selVertice adjMat
+            let nColorMap = Map.change selVertice (fun v -> match v with Some(_) -> Some(newColor) | None -> None) aColorMap
+            doColorization allColors (Set.remove selVertice verticies) nColorMap aGraph
         else
             aColorMap 
