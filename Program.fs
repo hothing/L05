@@ -240,10 +240,6 @@ g1 |> printfn "[V5.1] %A"
 let gc1 = makeColoredGraph 9 g1
 
 gc1 
-|> setColor 1 (X0RV "w") 
-|> setColor 2 (X0RV "y") 
-|> tie (fun g -> adjacentColorsExt (X0RV "z") g |> printfn "$>> %A")
-|> saturation (X0RV "z") 
 |> printfn "[V5.2] %A"
 
 coloring gc1 |> printfn "[V5.3] %A"
