@@ -53,9 +53,6 @@ module GraphColoring
         let theColors = (Set.filter (fun c -> c <> nonColor) colors)
         (theColors, Set.difference allColors theColors)
 
-    let saturation vertice aColoredGraph =
-        Set.count (adjacentColors vertice aColoredGraph)
-
     let adjacentColors0 aVertice aColorMap aGraph =
         let adjVx = adjacents aVertice aGraph
         let colors = Set.map (fun v -> Map.find v aColorMap) adjVx
@@ -67,9 +64,11 @@ module GraphColoring
         if not (List.isEmpty verticies) then
             let getEnv v =
                 let vx = adjacentColors0 v aColorMap aGraph
-                let nextColor = if Set.isEmpty vx 
+                let availableColors = Set.difference allColors vx
+                //printfn "[DBG][doColorization] adjacents %A with %A" vx availableColors
+                let nextColor = if Set.isEmpty availableColors // WARNING! Design problem: how to handle situation when there is no any color available
                                     then Set.minElement allColors // WARNING! Can trigger invalid result
-                                    else Set.minElement (Set.difference allColors vx) 
+                                    else Set.minElement availableColors 
                 (Set.count vx, nextColor)
             let adjMat = Map (List.map (fun v -> (v, getEnv v)) verticies)
             //printfn "[DBG][doColorization] sudoku %A" adjMat
