@@ -9,8 +9,7 @@ open X0Select
 open X0Patch
 open X0Homes
 open X0Print
-open X0Spill
-open ALGraph
+open BuildInterferences
 open GraphColoring
 
 printfn "Hello from F#: Nanopass compiler book exercises"
@@ -196,10 +195,11 @@ let x0prg = X0Program(["v"; "w"; "x"; "y"; "z"; "t.1"; "t.2"], [
     MovQ(X0Var "t.2", X0TReg Rax);
 ]) 
 
+
+(*
 match x0prg with
 | X0Program(vars, stmts) -> x0spilling (Set.empty) stmts |> printfn "[V5] %A"
 
-(*
     [
         (MovQ (X0Int 1, X0TVar "v"), set [X0RV "v"; X0RNone]);
         (MovQ (X0Int 46, X0TVar "w"), set [X0RV "v"; X0RV "w"; X0RNone]);
@@ -218,9 +218,7 @@ match x0prg with
 *)
 
 
-let g1 = match x0prg with
-            | X0Program(vars, stmts) -> 
-                x0spilling (Set.empty) stmts |> fst |> x0makeInterGraph 
+let g1 = buildInterferences x0prg
     
 g1 |> printfn "[V5.1] %A"
 
@@ -237,7 +235,7 @@ g1 |> printfn "[V5.1] %A"
     ]
 *)
 
-let gc1 = makeColoredGraph 2 g1
+let gc1 = makeColoredGraph 9 g1
 
 gc1 
 |> printfn "[V5.2] %A"

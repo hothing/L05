@@ -17,6 +17,7 @@
     <Compile Include="X0Print.fs" />
     <Compile Include="ALGraph.fs" />
     <Compile Include="GraphColoring.fs" />
+    <Compile Include="BuildInterferences.fs"/>
     <Compile Include="X0Spill.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
