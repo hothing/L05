@@ -237,9 +237,9 @@ g1 |> printfn "[V5.1] %A"
     ]
 *)
 
-let gc1 = makeColoredGraph 9 g1
+let gc1 = makeColoredGraph 2 g1
 
 gc1 
 |> printfn "[V5.2] %A"
 
-coloring gc1 |> printfn "[V5.3] %A"
+coloring false gc1 |> printfn "[V5.3] %A"
