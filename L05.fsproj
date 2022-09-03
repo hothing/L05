@@ -16,9 +16,9 @@
     <Compile Include="X0Homes.fs" />
     <Compile Include="X0Print.fs" />
     <Compile Include="ALGraph.fs" />
+    <Compile Include="X0BuildInterferences.fs"/>
     <Compile Include="GraphColoring.fs" />
-    <Compile Include="BuildInterferences.fs"/>
-    <Compile Include="X0Spill.fs" />
+    <Compile Include="X0Allocation.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>

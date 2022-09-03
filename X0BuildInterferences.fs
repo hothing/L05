@@ -1,4 +1,4 @@
-module BuildInterferences
+module X0BuildInterferences
 
     open X0Lang
     open ALGraph

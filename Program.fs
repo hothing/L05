@@ -9,7 +9,7 @@ open X0Select
 open X0Patch
 open X0Homes
 open X0Print
-open BuildInterferences
+open X0BuildInterferences
 open GraphColoring
 
 printfn "Hello from F#: Nanopass compiler book exercises"
