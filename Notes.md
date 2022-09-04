@@ -2,8 +2,8 @@
 
 ## solid-x0 branch
 
-   [ ] Re-define X0Program to hold 'varibale' list, 'allocations' map and 'instruction' list
-   [ ] Change 'select-instruction' procedure to adopt for new X0Program
+   [X] Re-define X0Program to hold 'varibale' list, 'allocations' map and 'instruction' list
+   [X] Change 'select-instruction' procedure to adopt for new X0Program
    [ ] Change 'assign-homes' procedure to adopt for new X0Program
    [ ] Change 'patching' procedure to adopt for new X0Program
    [ ] Change 'build-interferences' procedure to adopt for new X0Program

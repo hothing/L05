@@ -54,6 +54,9 @@ module X0Homes
 
         (endOffset - baseOffset, List.map translate stmts)
 
-    let assignHomes baseReg baseOffset x0prg =
-        match x0prg with
-        | X0Program(vars, stmts) -> x0assignHomes baseReg baseOffset vars stmts
+    let assignHomes baseReg baseOffset prg =
+        match prg with
+        | X0ProgramAbs(vars, stmts) -> 
+            let stackSize, nStmts = x0assignHomes baseReg baseOffset vars stmts
+            X0ProgramImp(Map (List.map (fun v -> (v, X0RNone)) vars), nStmts)
+        | X0ProgramImp (_) -> prg

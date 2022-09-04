@@ -5,5 +5,6 @@ module X0Allocation
 
     let x0varsAllocate prg =
         match prg with
-        | X0Program (_) -> prg
+        | X0ProgramAbs (_) 
+        | X0ProgramImp (_) -> prg
 

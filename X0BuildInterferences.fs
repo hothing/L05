@@ -8,8 +8,6 @@ module X0BuildInterferences
         and X0Cell = X0TReg of X0Register | X0TVar of X0Variable | X0TDeref of X0Register * int
     *)
 
-    type X0Reference = X0RR of X0Register | X0RD of X0Register * int | X0RV of X0Variable | X0RNone
-
     let uncoverLive prg =
         ([], prg)
 
@@ -86,7 +84,9 @@ module X0BuildInterferences
         List.fold (fun g x -> x0interference (fst x) (snd x) g) (makeGraph [X0RNone]) agStmts
     
 
-    let buildInterferences x0prg = 
-        match x0prg with
-            | X0Program(vars, stmts) -> 
+    let buildInterferences prg = 
+        match prg with
+            | X0ProgramAbs(vars, stmts) -> 
+                x0crossRef (Set.empty) stmts |> fst |> x0makeInterGraph
+            | X0ProgramImp(alloc, stmts) ->
                 x0crossRef (Set.empty) stmts |> fst |> x0makeInterGraph

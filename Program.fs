@@ -147,20 +147,20 @@ reduction moveRed x0prg6 |> printfn "%A"
 
 prg2 |> flatten |> selectInstruction 
      |> reduction moveRed |> patching |>  assignHomes Rbp 0 
-     |> snd |> print
+     |> print
      |> printfn "[Z2] %A"
 prg3 |> flatten |> selectInstruction 
      |> reduction moveRed |> patching |>  assignHomes Rbp 0 
-     |> snd |> print
+     |> print
      |> printfn "[Z3] %A"
 prg4 |> flatten |> selectInstruction 
      |> reduction moveRed |> patching |>  assignHomes Rbp 0 
-     |> snd |> print
+     |> print
      |> printfn "[Z4] %A"
 prg5 |> flatten |> selectInstruction 
      |> reduction moveRed |> patching |>  assignHomes Rbp 0 
      |> tie (printfn "[W5] %A")
-     |> snd |> print
+     |> print
      |> printfn "[Z5] %A"
 
 (*
@@ -179,7 +179,7 @@ prg5 |> flatten |> selectInstruction
 (addq (var t.1) (var t.2))
 (movq (var t.2) (reg rax)))
 *)
-let x0prg = X0Program(["v"; "w"; "x"; "y"; "z"; "t.1"; "t.2"], [
+let x0prg = X0ProgramAbs(["v"; "w"; "x"; "y"; "z"; "t.1"; "t.2"], [
     MovQ(X0Int 1, X0TVar "v");
     MovQ(X0Int 46, X0TVar "w");
     MovQ(X0Var "v", X0TVar "x");

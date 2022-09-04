@@ -47,5 +47,11 @@ module X0Print
         | CallQ(fname) -> $"call _{fname}"
         | RetQ -> $"ret"
 
-    let print stmts =
+    let printStmts stmts =
         String.concat "\n" (List.map (fun i -> $"{x0printInstr i}") stmts)
+
+    let print prg =
+        match prg with 
+        | X0ProgramAbs (vars, stmts) -> printStmts stmts
+        | X0ProgramImp (alloc, stmts) -> printStmts stmts
+        

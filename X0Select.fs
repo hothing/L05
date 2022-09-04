@@ -131,7 +131,7 @@ module X0Select
     let selectInstruction c0prg =
         match c0prg with
         | C0Program (vars, stmts) ->            
-            X0Program(vars, List.collect x0SelectInstr stmts)
+            X0ProgramAbs(vars, List.collect x0SelectInstr stmts)
  
     
     let rec x0reduct reductor nStmts stmts =
@@ -146,8 +146,9 @@ module X0Select
             | [] -> nStmts@[instr1]
         | [] -> nStmts
 
-    let reduction reductor x0prg =
-        match x0prg with
-        | X0Program (vars, stmts) ->            
-            X0Program(vars, x0reduct reductor [] stmts)
+    let reduction reductor prg =
+        match prg with
+        | X0ProgramAbs (vars, stmts) ->            
+            X0ProgramAbs(vars, x0reduct reductor [] stmts)
+        | X0ProgramImp (_) -> prg
  
