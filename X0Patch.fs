@@ -29,7 +29,10 @@ module X0Patch
     let x0patch patcher stmts =
         List.collect (patcher Rax) stmts
 
-    let patching x0prg =
-        match x0prg with
-        | X0Program (vars, stmts) ->            
-            X0Program(vars, x0patch x0patchMovQ stmts |> x0patch x0patchAddQ)
+    let patching prg =
+        match prg with
+        | X0ProgramAbs (vars, stmts) ->
+            X0ProgramAbs (vars, x0patch x0patchMovQ stmts |> x0patch x0patchAddQ)
+        | X0ProgramImp (vars, stmts) ->            
+            X0ProgramImp (vars, x0patch x0patchMovQ stmts |> x0patch x0patchAddQ) 
+        
