@@ -5,38 +5,39 @@ module X0Homes
 
     exception ItemAlreadyExists of string
 
-    let lookup name env =
-        let pred x = (fst x) = name
-        if List.exists pred env then
-            let _, item = List.find pred env
-            Some(item)
-        else
-            None
+    let allocateOnStack getSize stackRegister baseOffset vars =
+        let allocS, endOffset = 
+            List.mapFold 
+                (fun offset v ->
+                    let size = getSize v
+                    let varRef, nextOffset = (X0RD(stackRegister, -offset), offset + size - 1)
+                    ((v, varRef), nextOffset)) baseOffset vars
+        (allocS |> List.toSeq |> Map, endOffset - baseOffset)
 
-    let rec genHomes mapper baseOffset nVars vars =
-        match vars with
-        | v::rest -> 
-            let dr = mapper baseOffset v
-            let nOffset, nR = dr
-            let vMap = (v, (-nOffset, nR))
-            genHomes mapper nOffset (vMap::nVars) rest
-        | [] -> (baseOffset, nVars)
-
-    let x0assignHomes baseReg baseOffset vars stmts =
-        let endOffset, nVars = genHomes (fun offset v -> (offset + 8, baseReg)) baseOffset [] vars
+    let x0assignHomes nVars stmts =
         let transArg arg vars =
             match arg with
             | X0Var(name) -> 
-                match lookup name vars with
-                | Some(offs, reg) -> X0Deref(reg, offs)
+                match Map.tryFind name vars with
+                | Some(x) ->
+                    match x with
+                    | X0RR (reg) -> X0Reg reg
+                    | X0RD (reg, offset) -> X0Deref(reg, offset)
+                    | X0RV (vname) -> X0Var vname
+                    | _ -> raise (ItemNotFound(name))
                 | None -> raise (ItemNotFound(name))
             | _ -> arg
 
         let transCell cell vars =
             match cell with
             | X0TVar(name) -> 
-                match lookup name vars with
-                | Some(offs, reg) -> X0TDeref(reg, offs)
+                match Map.tryFind name vars with
+                | Some(x) -> 
+                    match x with
+                    | X0RR (reg) -> X0TReg reg
+                    | X0RD (reg, offset) -> X0TDeref(reg, offset)
+                    | X0RV (vname) -> X0TVar vname
+                    | _ -> raise (ItemNotFound(name))
                 | None -> raise (ItemNotFound(name))
             | _ -> cell
 
@@ -52,11 +53,15 @@ module X0Homes
             | PopQ(cell) -> PopQ(transCell cell nVars)
             | _ -> stmt
 
-        (endOffset - baseOffset, List.map translate stmts)
+        List.map translate stmts
 
-    let assignHomes baseReg baseOffset prg =
+    let assignHomes stackReg baseOffset prg =
         match prg with
-        | X0ProgramAbs(vars, stmts) -> 
-            let stackSize, nStmts = x0assignHomes baseReg baseOffset vars stmts
-            X0ProgramImp(Map (List.map (fun v -> (v, X0RNone)) vars), nStmts)
-        | X0ProgramImp (_) -> prg
+        | X0ProgramAbs(vars, stmts) ->
+            let allocVars, stackSize = 
+                allocateOnStack (fun v -> 8) stackReg baseOffset vars 
+            let nStmts = x0assignHomes allocVars stmts
+            X0ProgramImp(allocVars, nStmts)
+        | X0ProgramImp (allocVars, stmts) ->
+            let nStmts = x0assignHomes allocVars stmts
+            X0ProgramImp(allocVars, nStmts)
