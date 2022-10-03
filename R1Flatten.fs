@@ -59,9 +59,16 @@ module R1Flatten
             let nAssigments = (C0Assign(tname, C0Arg(arg2)))::nAssigments            
             (C0Var(tname), nAssigments, nVars)
 
-    let flatten prg =
+    let flattenX prg =
         match prg with 
         | Program exp -> 
             let nExp, vMap = r1uniquify exp (0, [])
             let arg, nAssigments, nVars = r1flatten nExp [] (0, [])
             (C0Program((snd nVars), List.rev ((C0Return(arg))::nAssigments)), vMap)
+
+    let flatten prg =
+        match prg with 
+        | Program exp -> 
+            let nExp, vMap = r1uniquify exp (0, [])
+            let arg, nAssigments, nVars = r1flatten nExp [] (0, [])
+            C0Program((snd nVars), List.rev ((C0Return(arg))::nAssigments))

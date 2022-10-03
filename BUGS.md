@@ -1,43 +1,94 @@
 # BUGS list
 
-## Uniquify bug 1
+## Reductor
 
-let prg4 = Program(Let("x", EInt 32, 
-    Binary(Add, 
-        Let("y", EInt 10, Var("y")), 
-        Var("x"))))
-let prg4' = Program(Let("x", EInt 32, Binary(Add, Let("x", EInt 10, Var("x")), Var("x"))))
+Код модифицируется корретно, но не реализована модификация списка переменных
 
-Hello from F#: Nanopass compiler book exercises
-[0.3]>> (42, [5])
-[0.3.1]>> (42, [5])
-[5.3]>> (Program
-   (Let
-      ("t.1", EInt 32, 
-        Binary (Add, Let ("t.2", EInt 10, Var "t.2"), 
-        Var "t.1"))),
- (2, [("y", "t.2"); ("x", "t.1")]))
-[5.3.1]>> (Program
-   (Let
-      ("t.1", EInt 32, 
-        Binary (Add, Let ("t.2", EInt 10, Var "t.2"), 
-        Var "t.2"))),
- (2, [("x", "t.2"); ("x", "t.1")]))
+## Graph coloring with DSATUR
 
-[8.3.0]~~ C0Program
-  (["m.3"; "m.2"; "m.1"; "t.2"; "t.1"],
-   [C0Assign ("t.1", C0Arg (C0Int 32)); 
-    C0Assign ("t.2", C0Arg (C0Int 10));
-    C0Assign ("m.1", C0Arg (C0Var "t.2"));
-    C0Assign ("m.2", C0Add (C0Var "m.1", C0Var "t.1"));
-    C0Assign ("m.3", C0Arg (C0Var "m.2")); C0Return (C0Var "m.3")])        
-[8.3.0]>> (42, [5])
-[8.3.1]~~ C0Program
-  (["m.3"; "m.2"; "m.1"; "t.2"; "t.1"],
-   [C0Assign ("t.1", C0Arg (C0Int 32)); 
-    C0Assign ("t.2", C0Arg (C0Int 10));
-    C0Assign ("m.1", C0Arg (C0Var "t.2"));
-    C0Assign ("m.2", C0Add (C0Var "m.1", C0Var "t.2")); <-- BUG HERE
-    C0Assign ("m.3", C0Arg (C0Var "m.2")); C0Return (C0Var "m.3")])        
-[8.3.1]>> (20, [5])
+Input>
+[V5.2] (map
+   [(X0RV "t.1", set [X0RV "t.2"; X0RV "z"]); 
+    (X0RV "t.2", set [X0RV "t.1"]);
+    (X0RV "v", set [X0RV "w"]);
+    (X0RV "w", set [X0RV "v"; X0RV "x"; X0RV "y"; X0RV "z"]);
+    (X0RV "x", set [X0RV "w"; X0RV "y"]);
+    (X0RV "y", set [X0RV "w"; X0RV "x"; X0RV "z"]);
+    (X0RV "z", set [X0RV "t.1"; X0RV "w"; X0RV "y"]); (X0RNone, set [])],
+ map
+   [(X0RV "t.1", 0); (X0RV "t.2", 0); (X0RV "v", 0); (X0RV "w", 0);
+    (X0RV "x", 0); (X0RV "y", 0); (X0RV "z", 0); (X0RNone, 0)],
+ set [1; 2; 3; 4; 5; 6; 7; 8; 9])
+
+Output>
+[DBG][doColorization] sudoku map
+  [(X0RV "t.1", (0, 1)); (X0RV "t.2", (0, 1)); (X0RV "v", (0, 1));
+   (X0RV "w", (0, 1)); (X0RV "x", (0, 1)); (X0RV "y", (0, 1));
+   (X0RV "z", (0, 1)); (X0RNone, (0, 1))]
+[DBG][doColorization] highest saturation level = 0
+[DBG][doColorization] selected vertice X0RV "t.1"
+[DBG][doColorization] selected color 1
+[DBG][doColorization] new color map map
+  [(X0RV "t.1", 1); (X0RV "t.2", 0); (X0RV "v", 0); (X0RV "w", 0); (X0RV "x", 0);
+   (X0RV "y", 0); (X0RV "z", 0); (X0RNone, 0)]
+[DBG][doColorization] sudoku map
+  [(X0RV "t.2", (1, 2)); (X0RV "v", (0, 1)); (X0RV "w", (0, 1));
+   (X0RV "x", (0, 1)); (X0RV "y", (0, 1)); (X0RV "z", (1, 2)); (X0RNone, (0, 1))]
+[DBG][doColorization] highest saturation level = 1
+[DBG][doColorization] selected vertice X0RV "t.2"
+[DBG][doColorization] selected color 2
+[DBG][doColorization] new color map map
+  [(X0RV "t.1", 1); (X0RV "t.2", 2); (X0RV "v", 0); (X0RV "w", 0); (X0RV "x", 0);
+   (X0RV "y", 0); (X0RV "z", 0); (X0RNone, 0)]
+[DBG][doColorization] sudoku map
+  [(X0RV "v", (0, 1)); (X0RV "w", (0, 1)); (X0RV "x", (0, 1));
+   (X0RV "y", (0, 1)); (X0RV "z", (1, 2)); (X0RNone, (0, 1))]
+[DBG][doColorization] highest saturation level = 1
+[DBG][doColorization] selected vertice X0RV "z"
+[DBG][doColorization] selected color 2
+[DBG][doColorization] new color map map
+  [(X0RV "t.1", 1); (X0RV "t.2", 2); (X0RV "v", 0); (X0RV "w", 0); (X0RV "x", 0);
+   (X0RV "y", 0); (X0RV "z", 2); (X0RNone, 0)]
+[DBG][doColorization] sudoku map
+  [(X0RV "v", (0, 1)); (X0RV "w", (1, 1)); (X0RV "x", (0, 1));
+   (X0RV "y", (1, 1)); (X0RNone, (0, 1))]
+[DBG][doColorization] highest saturation level = 1
+[DBG][doColorization] selected vertice X0RV "w"
+[DBG][doColorization] selected color 1
+[DBG][doColorization] new color map map
+  [(X0RV "t.1", 1); (X0RV "t.2", 2); (X0RV "v", 0); (X0RV "w", 1); (X0RV "x", 0);
+   (X0RV "y", 0); (X0RV "z", 2); (X0RNone, 0)]
+[DBG][doColorization] sudoku map
+  [(X0RV "v", (1, 2)); (X0RV "x", (1, 2)); (X0RV "y", (2, 3)); (X0RNone, (0, 1))]
+[DBG][doColorization] highest saturation level = 2
+[DBG][doColorization] selected vertice X0RV "y"
+[DBG][doColorization] selected color 3
+[DBG][doColorization] new color map map
+  [(X0RV "t.1", 1); (X0RV "t.2", 2); (X0RV "v", 0); (X0RV "w", 1); (X0RV "x", 0);
+   (X0RV "y", 3); (X0RV "z", 2); (X0RNone, 0)]
+[DBG][doColorization] sudoku map [(X0RV "v", (1, 2)); (X0RV "x", (2, 2)); (X0RNone, (0, 1))]
+[DBG][doColorization] highest saturation level = 2
+[DBG][doColorization] selected vertice X0RV "x"
+[DBG][doColorization] selected color 2
+[DBG][doColorization] new color map map
+  [(X0RV "t.1", 1); (X0RV "t.2", 2); (X0RV "v", 0); (X0RV "w", 1); (X0RV "x", 2);
+   (X0RV "y", 3); (X0RV "z", 2); (X0RNone, 0)]
+[DBG][doColorization] sudoku map [(X0RV "v", (1, 2)); (X0RNone, (0, 1))]
+[DBG][doColorization] highest saturation level = 1
+[DBG][doColorization] selected vertice X0RV "v"
+[DBG][doColorization] selected color 2
+[DBG][doColorization] new color map map
+  [(X0RV "t.1", 1); (X0RV "t.2", 2); (X0RV "v", 2); (X0RV "w", 1); (X0RV "x", 2);
+   (X0RV "y", 3); (X0RV "z", 2); (X0RNone, 0)]
+[DBG][doColorization] sudoku map [(X0RNone, (0, 1))]
+[DBG][doColorization] highest saturation level = 0
+[DBG][doColorization] selected vertice X0RNone
+[DBG][doColorization] selected color 1
+[DBG][doColorization] new color map map
+  [(X0RV "t.1", 1); (X0RV "t.2", 2); (X0RV "v", 2); (X0RV "w", 1); (X0RV "x", 2);
+   (X0RV "y", 3); (X0RV "z", 2); (X0RNone, 1)]
+[DBG][doColorization] finish
+[V5.3] map
+  [(X0RV "t.1", 1); (X0RV "t.2", 2); (X0RV "v", 2); (X0RV "w", 1); (X0RV "x", 2);
+   (X0RV "y", 3); (X0RV "z", 2); (X0RNone, 1)]
 

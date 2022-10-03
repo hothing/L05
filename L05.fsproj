@@ -11,7 +11,14 @@
     <Compile Include="R1Flatten.fs" />
     <Compile Include="C0Interpreter.fs" />
     <Compile Include="X0Lang.fs" />
-    <Compile Include="C0Select.fs" />
-	  <Compile Include="Program.fs" />
+    <Compile Include="X0Select.fs" />
+    <Compile Include="X0Patch.fs" />
+    <Compile Include="X0Homes.fs" />
+    <Compile Include="X0Print.fs" />
+    <Compile Include="ALGraph.fs" />
+    <Compile Include="X0BuildInterferences.fs"/>
+    <Compile Include="GraphColoring.fs" />
+    <Compile Include="X0Allocation.fs" />
+    <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>
