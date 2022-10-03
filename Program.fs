@@ -220,24 +220,10 @@ match x0prg with
 
 let g1 = buildInterferences x0prg
     
-g1 |> printfn "[V5.1] %A"
-
-(*
-    [
-        (X0RV "t.1", set [X0RV "t.2"; X0RV "z"]); 
-        (X0RV "t.2", set [X0RV "t.1"]);
-        (X0RV "v", set [X0RV "w"]);
-        (X0RV "w", set [X0RV "v"; X0RV "x"; X0RV "y"; X0RV "z"]);
-        (X0RV "x", set [X0RV "w"; X0RV "y"]);
-        (X0RV "y", set [X0RV "w"; X0RV "x"; X0RV "z"]);
-        (X0RV "z", set [X0RV "t.1"; X0RV "w"; X0RV "y"]); 
-        (X0RNone, set [])
-    ]
-*)
-
-let gc1 = makeColoredGraph 9 g1
-
-gc1 
-|> printfn "[V5.2] %A"
-
-coloring false gc1 |> printfn "[V5.3] %A"
+g1 
+|> tie (printfn "[Y5.1] %A")
+|> Map.filter (fun v a -> v <> X0RNone)
+|> coloring 
+|> tie (printfn "[Y5.2] %A")
+|> Map.toList |> List.choose (fun e -> match (snd e) with | Some(aColor) -> Some((fst e, aColor)) | None -> None)
+|> printfn "[Y5.3] %A"
