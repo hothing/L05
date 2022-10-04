@@ -5,15 +5,6 @@ module X0Homes
 
     exception ItemAlreadyExists of string
 
-    let allocateOnStack getSize stackRegister baseOffset vars =
-        let allocS, endOffset = 
-            List.mapFold 
-                (fun offset v ->
-                    let size = getSize v
-                    let varRef, nextOffset = (X0RD(stackRegister, -offset), offset + size - 1)
-                    ((v, varRef), nextOffset)) baseOffset vars
-        (allocS |> List.toSeq |> Map, endOffset - baseOffset)
-
     let x0assignHomes nVars stmts =
         let transArg arg vars =
             match arg with
@@ -22,9 +13,8 @@ module X0Homes
                 | Some(x) ->
                     match x with
                     | X0RR (reg) -> X0Reg reg
-                    | X0RD (reg, offset) -> X0Deref(reg, offset)
-                    | X0RV (vname) -> X0Var vname
-                    | _ -> raise (ItemNotFound(name))
+                    | X0RM (reg, offset) -> X0Deref(reg, offset)
+                    | X0RV (vname) -> X0Var vname                    
                 | None -> raise (ItemNotFound(name))
             | _ -> arg
 
@@ -35,9 +25,8 @@ module X0Homes
                 | Some(x) -> 
                     match x with
                     | X0RR (reg) -> X0TReg reg
-                    | X0RD (reg, offset) -> X0TDeref(reg, offset)
-                    | X0RV (vname) -> X0TVar vname
-                    | _ -> raise (ItemNotFound(name))
+                    | X0RM (reg, offset) -> X0TDeref(reg, offset)
+                    | X0RV (vname) -> X0TVar vname                    
                 | None -> raise (ItemNotFound(name))
             | _ -> cell
 
@@ -55,11 +44,10 @@ module X0Homes
 
         List.map translate stmts
 
-    let assignHomes stackReg baseOffset prg =
+    let assignHomes allocator prg =
         match prg with
         | X0ProgramAbs(vars, stmts) ->
-            let allocVars, stackSize = 
-                allocateOnStack (fun v -> 8) stackReg baseOffset vars 
+            let allocVars = allocator vars
             let nStmts = x0assignHomes allocVars stmts
             X0ProgramImp(allocVars, nStmts)
         | X0ProgramImp (allocVars, stmts) ->

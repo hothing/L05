@@ -11,6 +11,7 @@ open X0Homes
 open X0Print
 open X0BuildInterferences
 open GraphColoring
+open X0Allocation
 
 printfn "Hello from F#: Nanopass compiler book exercises"
 
@@ -145,20 +146,23 @@ let moveRed instr1 instr2 =
 
 reduction moveRed x0prg6 |> printfn "%A"
 
+let allocatorS vars = 
+    prepareAllocation vars |> allocateOnStack (fun x -> 8) Rbp 0
+
 prg2 |> flatten |> selectInstruction 
-     |> reduction moveRed |> patching |>  assignHomes Rbp 0 
+     |> reduction moveRed |> patching |>  assignHomes allocatorS  
      |> print
      |> printfn "[Z2] %A"
 prg3 |> flatten |> selectInstruction 
-     |> reduction moveRed |> patching |>  assignHomes Rbp 0 
+     |> reduction moveRed |> patching |>  assignHomes allocatorS 
      |> print
      |> printfn "[Z3] %A"
 prg4 |> flatten |> selectInstruction 
-     |> reduction moveRed |> patching |>  assignHomes Rbp 0 
+     |> reduction moveRed |> patching |>  assignHomes allocatorS 
      |> print
      |> printfn "[Z4] %A"
 prg5 |> flatten |> selectInstruction 
-     |> reduction moveRed |> patching |>  assignHomes Rbp 0 
+     |> reduction moveRed |> patching |>  assignHomes allocatorS 
      |> tie (printfn "[W5] %A")
      |> print
      |> printfn "[Z5] %A"
@@ -222,11 +226,10 @@ let g1 = buildInterferences x0prg
     
 let cg1 = g1 
         |> tie (printfn "[Y5.1] %A")
-        |> Map.filter (fun v a -> v <> X0RNone)
         |> coloring 
 
 cg1 |> tie (printfn "[Y5.2] %A")
-|> Map.toList |> List.choose (fun e -> match (snd e) with | Some(aColor) -> Some((fst e, aColor)) | None -> None)
+|> purifyColoring
 |> printfn "[Y5.3] %A"
 
 cg1 |> chormaticNumber |> printfn "[Y5.3] %A"

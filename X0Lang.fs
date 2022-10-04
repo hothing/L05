@@ -3,7 +3,7 @@ module X0Lang
     type X0Language = X0ProgramAbs of X0Variable list * X0Instruction list 
                     | X0ProgramImp of Map<X0Variable, X0Reference> * X0Instruction list
     and X0Variable = string
-    and X0Reference = X0RR of X0Register | X0RD of X0Register * int | X0RV of X0Variable | X0RNone
+    and X0Reference = X0RR of X0Register | X0RM of X0Register * int | X0RV of X0Variable
     and X0Instruction = AddQ of X0Arg * X0Cell 
                         | SubQ of X0Arg * X0Cell
                         | MulQ of X0Arg * X0Cell
