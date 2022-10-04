@@ -220,10 +220,13 @@ match x0prg with
 
 let g1 = buildInterferences x0prg
     
-g1 
-|> tie (printfn "[Y5.1] %A")
-|> Map.filter (fun v a -> v <> X0RNone)
-|> coloring 
-|> tie (printfn "[Y5.2] %A")
+let cg1 = g1 
+        |> tie (printfn "[Y5.1] %A")
+        |> Map.filter (fun v a -> v <> X0RNone)
+        |> coloring 
+
+cg1 |> tie (printfn "[Y5.2] %A")
 |> Map.toList |> List.choose (fun e -> match (snd e) with | Some(aColor) -> Some((fst e, aColor)) | None -> None)
 |> printfn "[Y5.3] %A"
+
+cg1 |> chormaticNumber |> printfn "[Y5.3] %A"

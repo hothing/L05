@@ -59,9 +59,6 @@ module GraphColoring
         let verticies =   
                 Map.filter (fun v a -> (fst a) = None) aColorMap
                 |> Map.toList 
-                
-        //printfn "[DBG][doColorization] verticies %A on colormap %A" verticies aColorMap
-
         if not (List.isEmpty verticies) then
             let highestSat = 
                 verticies
@@ -91,11 +88,9 @@ module GraphColoring
         let aGraph, aColorMap = makeColoredGraph aGraph
         doColorization (Set [1]) aGraph aColorMap |> Map.map (fun v a -> (fst a))
 
-    let chormaticNumberByColorMap aColorMap =
-        let x = Map.toList aColorMap |> List.map (fun a -> (snd a))
-        x |> List.choose id |> List.max
+    let purifyColoring aColorMap =
+        Map.toList aColorMap |> List.choose (fun e -> match (snd e) with | Some(aColor) -> Some((fst e, aColor)) | None -> None)
 
-    let chormaticNumber aGraph =
-        let aColorMap = coloring aGraph
+    let chormaticNumber aColorMap =
         let x = Map.toList aColorMap |> List.map (fun a -> (snd a))
-        x |> List.choose id |> List.max
+        x |> List.choose id |> List.distinct |> List.length
